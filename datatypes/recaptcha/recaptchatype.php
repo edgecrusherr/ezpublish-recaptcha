@@ -30,6 +30,9 @@ define( "EZ_DATATYPESTRING_RECAPTCHA", "recaptcha" );
 
 class recaptchaType extends eZDataType
 {
+
+    const GOOGLE_RECAPTCHA_URL = 'https://www.google.com/recaptcha/api/siteverify';
+
   /*!
    Construction of the class, note that the second parameter in eZDataType 
    is the actual name showed in the datatype dropdown list.
@@ -106,13 +109,30 @@ class recaptchaType extends eZDataType
         // try our luck with the first entry
         $privatekey = array_shift($privatekey);
     }
-    $recaptcha_challenge_field = $http->postVariable('recaptcha_challenge_field');
-    $recaptcha_response_field = $http->postVariable('recaptcha_response_field');
-    $resp = recaptcha_check_answer ($privatekey,
-                                $_SERVER["REMOTE_ADDR"],
-                                $recaptcha_challenge_field,
-                                $recaptcha_response_field);
-    return $resp->is_valid;
+
+    $response = $http->postVariable('g-recaptcha-response');
+
+    $fields = array(
+        'secret' => $privatekey,
+        'response' => $response,
+        'remoteip' => $_SERVER["REMOTE_ADDR"],
+    );
+    $fields_string = '';
+    foreach ($fields as $key => $value) {
+            $fields_string .= $key . '=' . $value . '&';
+    }
+    rtrim( $fields_string, '&' );
+
+    $ch = curl_init();
+    curl_setopt( $ch,CURLOPT_URL, self::GOOGLE_RECAPTCHA_URL );
+    curl_setopt( $ch,CURLOPT_POST, count( $fields ) );
+    curl_setopt( $ch,CURLOPT_POSTFIELDS, $fields_string );
+    curl_setopt($ch, CURLOPT_HEADER, 0);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $result = json_decode( curl_exec($ch) );
+    curl_close($ch);
+
+    return $result->success;
   }
 
 }
