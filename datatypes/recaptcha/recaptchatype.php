@@ -21,8 +21,6 @@
 
 // Include the super class file
 include_once( "kernel/classes/ezdatatype.php" );
-// Include reCAPTCHA lib
-include_once( "extension/recaptcha/classes/recaptchalib.php" );
 
 // Define the name of datatype string
 define( "EZ_DATATYPESTRING_RECAPTCHA", "recaptcha" );

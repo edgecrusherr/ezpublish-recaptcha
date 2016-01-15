@@ -4,7 +4,7 @@
 DesignExtensions[]=recaptcha
 
 [JavaScriptSettings]
-JavaScriptList[]=http://www.google.com/recaptcha/api.js
+JavaScriptList[]=https://www.google.com/recaptcha/api.js
 
 */ ?>
 
